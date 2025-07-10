@@ -7,6 +7,11 @@ from dooray_client import (
     create_incoming_hook,
     get_incoming_hook,
     delete_incoming_hook,
+    # Admin API
+    create_admin_member,
+    get_admin_members,
+    update_admin_member,
+    leave_admin_member,
     # Drive API
     get_drive_list,
     get_drive,
@@ -91,7 +96,7 @@ def _handle_api_call(result):
 
 def _get_api_key(request: Request):
     # ChatGPT는 API Key를 'X-API-Key' 헤더로 보낼 가능성이 높습니다。
-    # 또는 'Authorization' 헤더에 'Bearer <API_KEY>' 형태로 보낼 수도 있습니다.
+    # 또는 'Authorization' 헤더에 'Bearer <API_KEY>' 형태로 보낼 수도 있습니다。
     api_key = request.headers.get("X-API-Key")
     if not api_key:
         # 'Authorization: Bearer <API_KEY>' 형태도 고려
@@ -150,6 +155,44 @@ async def api_delete_incoming_hook(request: Request):
     if not incoming_hook_id:
         raise HTTPException(status_code=400, detail="incoming_hook_id is required")
     result = delete_incoming_hook(api_key, incoming_hook_id)
+    return _handle_api_call(result)
+
+# --- Admin API ---
+@app.post("/mcp/admin/members/create")
+async def api_create_admin_member(request: Request):
+    api_key = _get_api_key(request)
+    body = await request.json()
+    member_data = body.get("member_data")
+    if not member_data or not isinstance(member_data, dict):
+        raise HTTPException(status_code=400, detail="member_data (dict) is required")
+    result = create_admin_member(api_key, member_data)
+    return _handle_api_call(result)
+
+@app.post("/mcp/admin/members/list")
+async def api_get_admin_members(request: Request):
+    api_key = _get_api_key(request)
+    result = get_admin_members(api_key)
+    return _handle_api_call(result)
+
+@app.post("/mcp/admin/members/update")
+async def api_update_admin_member(request: Request):
+    api_key = _get_api_key(request)
+    body = await request.json()
+    member_id = body.get("member_id")
+    member_data = body.get("member_data")
+    if not member_id or not member_data or not isinstance(member_data, dict):
+        raise HTTPException(status_code=400, detail="member_id and member_data (dict) are required")
+    result = update_admin_member(api_key, member_id, member_data)
+    return _handle_api_call(result)
+
+@app.post("/mcp/admin/members/leave")
+async def api_leave_admin_member(request: Request):
+    api_key = _get_api_key(request)
+    body = await request.json()
+    member_id = body.get("member_id")
+    if not member_id:
+        raise HTTPException(status_code=400, detail="member_id is required")
+    result = leave_admin_member(api_key, member_id)
     return _handle_api_call(result)
 
 # --- Drive API ---

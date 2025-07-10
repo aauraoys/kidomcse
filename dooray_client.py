@@ -63,6 +63,21 @@ def get_incoming_hook(access_token: str, incoming_hook_id: str):
 def delete_incoming_hook(access_token: str, incoming_hook_id: str):
     return _call_dooray_api(access_token, "DELETE", f"/common/v1/incoming-hooks/{incoming_hook_id}")
 
+# --- Admin API ---
+def create_admin_member(access_token: str, member_data: dict):
+    # member_data should contain fields like: userId, name, email, departmentId, etc.
+    return _call_dooray_api(access_token, "POST", "/admin/v1/members", member_data)
+
+def get_admin_members(access_token: str):
+    return _call_dooray_api(access_token, "GET", "/admin/v1/members")
+
+def update_admin_member(access_token: str, member_id: str, member_data: dict):
+    # member_data should contain fields to update
+    return _call_dooray_api(access_token, "PUT", f"/admin/v1/members/{member_id}", member_data)
+
+def leave_admin_member(access_token: str, member_id: str):
+    return _call_dooray_api(access_token, "POST", f"/admin/v1/members/{member_id}/leave")
+
 # --- Drive API ---
 def get_drive_list(access_token: str, type: str = "private"):
     return _call_dooray_api(access_token, "GET", "/drive/v1/drives", params={"type": type})

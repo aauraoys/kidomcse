@@ -23,6 +23,20 @@
   - 엔드포인트: `POST /mcp/common/incoming_hooks/delete`
   - 요청 본문: `{"incoming_hook_id": "<훅 ID>"}`
 
+### Admin API
+- **멤버 추가**: 새로운 멤버를 추가합니다. (관리자 권한 필요)
+  - 엔드포인트: `POST /mcp/admin/members/create`
+  - 요청 본문: `{"member_data": {"userId": "<사용자 ID>", "name": "<이름>", "email": "<이메일>", "departmentId": "<부서 ID>", ...}}`
+- **멤버 목록 조회**: 관리자 권한으로 멤버 목록을 조회합니다. (관리자 권한 필요)
+  - 엔드포인트: `POST /mcp/admin/members/list`
+  - 요청 본문: `{}`
+- **멤버 수정**: 특정 멤버의 정보를 수정합니다. (관리자 권한 필요)
+  - 엔드포인트: `POST /mcp/admin/members/update`
+  - 요청 본문: `{"member_id": "<멤버 ID>", "member_data": {"name": "<새 이름 (선택 사항)>", ...}}`
+- **멤버 퇴사 처리**: 특정 멤버를 퇴사 처리합니다. (관리자 권한 필요)
+  - 엔드포인트: `POST /mcp/admin/members/leave`
+  - 요청 본문: `{"member_id": "<멤버 ID>"}`
+
 ### 드라이브 API
 - **드라이브 목록 조회**: 사용자의 개인 드라이브 목록을 조회합니다.
   - 엔드포인트: `POST /mcp/drive/list`
@@ -304,6 +318,8 @@ ChatGPT에서 이 MCP 서버를 연결한 후, 다음과 같이 프롬프트를 
 - **조직도 전체 조회**: "두레이 조직도 전체를 보여줘. 비활성 사용자도 포함해줘."
 - **부서 상세 조회**: "<부서 ID> 부서의 상세 정보를 알려줘."
 - **사용자 상세 조회**: "<사용자 ID> 사용자의 상세 정보를 알려줘."
+- **멤버 추가**: "새로운 멤버를 두레이에 추가해줘. 사용자 ID는 'newuser', 이름은 '새로운 사용자', 이메일은 'newuser@example.com', 부서 ID는 'dept123'이야."
+- **멤버 퇴사 처리**: "'olduser' ID를 가진 멤버를 퇴사 처리해줘."
 
 ## ⚠️ 중요 사항
 
