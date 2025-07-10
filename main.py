@@ -96,7 +96,7 @@ def _handle_api_call(result):
 
 def _get_api_key(request: Request):
     # ChatGPT는 API Key를 'X-API-Key' 헤더로 보낼 가능성이 높습니다。
-    # 또는 'Authorization' 헤더에 'Bearer <API_KEY>' 형태로 보낼 수도 있습니다。
+    # 또는 'Authorization' 헤더에 'Bearer <API_KEY>' 형태로 보낼 수도 있습니다.
     api_key = request.headers.get("X-API-Key")
     if not api_key:
         # 'Authorization: Bearer <API_KEY>' 형태도 고려
@@ -168,7 +168,7 @@ async def api_create_admin_member(request: Request):
     result = create_admin_member(api_key, member_data)
     return _handle_api_call(result)
 
-@app.post("/mcp/admin/members/list")
+@app.get("/mcp/admin/members")
 async def api_get_admin_members(request: Request):
     api_key = _get_api_key(request)
     result = get_admin_members(api_key)

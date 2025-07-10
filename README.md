@@ -28,7 +28,7 @@
   - 엔드포인트: `POST /mcp/admin/members/create`
   - 요청 본문: `{"member_data": {"userId": "<사용자 ID>", "name": "<이름>", "email": "<이메일>", "departmentId": "<부서 ID>", ...}}`
 - **멤버 목록 조회**: 관리자 권한으로 멤버 목록을 조회합니다. (관리자 권한 필요)
-  - 엔드포인트: `POST /mcp/admin/members/list`
+  - 엔드포인트: `GET /mcp/admin/members`
   - 요청 본문: `{}`
 - **멤버 수정**: 특정 멤버의 정보를 수정합니다. (관리자 권한 필요)
   - 엔드포인트: `POST /mcp/admin/members/update`
