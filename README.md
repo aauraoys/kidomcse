@@ -130,13 +130,12 @@
 
 ## 🔑 인증 방식
 
-이 MCP 서버는 **Dooray 개인 인증 토큰**을 사용하여 API를 인증합니다. 이는 ChatGPT Connector에서 API Key 형태로 입력받는 것을 가정합니다.
+이 MCP 서버는 **Dooray 개인 인증 토큰**을 사용하여 API를 인증합니다. 이 토큰은 ChatGPT Connector에서 **API Key 형태로 HTTP 요청 헤더를 통해 전달**됩니다.
 
 1.  **Dooray 개인 인증 토큰 발급**: Dooray 웹 인터페이스에서 `개인 설정 > API > 개인 인증 토큰` 메뉴로 이동하여 토큰을 발급받습니다.
-2.  **환경 변수 설정**: 발급받은 토큰을 `.env` 파일에 `DOORAY_ACCESS_TOKEN`으로 설정합니다.
+2.  **ChatGPT Connector 설정**: 발급받은 토큰을 ChatGPT Connector 설정 시 API Key 입력란에 입력합니다. ChatGPT는 이 값을 MCP 서버로 보내는 HTTP 요청의 `X-API-Key` 또는 `Authorization: Bearer <API_KEY>` 헤더에 포함하여 전달합니다.
 
     ```dotenv
-    DOORAY_ACCESS_TOKEN=your_personal_api_token_here
     # 공공 두레이 사용자의 경우, 기본 URL을 설정할 수 있습니다.
     # DOORAY_BASE_URL=https://api.gov-dooray.com
     ```
@@ -155,7 +154,7 @@
     pip install -r requirements.txt
     # 또는 pip3 install -r requirements.txt
     ```
-3.  **.env 파일 설정**: 위에서 설명한 대로 `.env` 파일을 생성하고 `DOORAY_ACCESS_TOKEN`을 설정합니다.
+3.  **.env 파일 설정 (선택 사항)**: `DOORAY_BASE_URL`을 설정할 수 있습니다. `DOORAY_ACCESS_TOKEN`은 더 이상 `.env` 파일에서 읽지 않습니다.
 4.  **서버 실행**: Uvicorn을 사용하여 FastAPI 애플리케이션을 실행합니다.
     ```bash
     uvicorn main:app --host 0.0.0.0 --port 8000
@@ -164,7 +163,7 @@
 
 ### Docker를 사용하여 배포
 
-1.  **.env 파일 설정**: 위에서 설명한 대로 `.env` 파일을 생성하고 `DOORAY_ACCESS_TOKEN`을 설정합니다.
+1.  **.env 파일 설정 (선택 사항)**: `DOORAY_BASE_URL`을 설정할 수 있습니다. `DOORAY_ACCESS_TOKEN`은 더 이상 `.env` 파일에서 읽지 않습니다.
 2.  **Docker 이미지 빌드**: 프로젝트 루트 디렉토리에서 다음 명령어를 실행하여 Docker 이미지를 빌드합니다.
     ```bash
     docker build -t dooray-mcp-server .
@@ -181,7 +180,7 @@ ChatGPT에서 이 MCP 서버를 Connector로 연결하려면, 다음과 유사�
 
 1.  **Connector URL**: MCP 서버가 배포된 공개 URL을 입력합니다. (예: `https://your-mcp-server.com`)
 2.  **인증 방식**: `API Key` 또는 유사한 옵션을 선택합니다.
-3.  **API Key 입력**: `DOORAY_ACCESS_TOKEN`에 설정한 개인 인증 토큰 값을 입력합니다.
+3.  **API Key 입력**: `DOORAY_ACCESS_TOKEN`에 설정한 개인 인증 토큰 값을 입력합니다. ChatGPT는 이 값을 MCP 서버로 보내는 HTTP 요청의 `X-API-Key` 또는 `Authorization: Bearer <API_KEY>` 헤더에 포함하여 전달합니다.
 
 ## 💡 사용 예시 (ChatGPT 프롬프트)
 
@@ -191,7 +190,7 @@ ChatGPT에서 이 MCP 서버를 연결한 후, 다음과 같이 프롬프트를 
 - **프로젝트 목록 조회**: "두레이 프로젝트 목록 보여줘."
 - **업무 생성**: "<개발팀 프로젝트>에 '새로운 기능 개발'이라는 업무를 생성해줘. 내용은 '사용자 피드백 반영'이야."
 - **위키 페이지 생성**: "<팀 위키 프로젝트>에 '새로운 기능 문서'라는 위키 페이지를 만들어줘. 내용은 '이 문서는 새로운 기능에 대한 설명입니다.'야."
-- **일정 생성**: "내일 오전 10시에 '팀 회의' 일정을 만들어줘. 장소는 '회의실 A'이고, 내용은 '주간 업무 보고'야."
+- **일정 생성**: "내일 오전 10시에 '팀 주간 회의' 일정을 만들어줘. 장소는 '회의실 A'이고, 내용은 '주간 업무 보고'야."
 - **자원 예약**: "내일 오후 2시에 '회의실 B'를 1시간 동안 예약해줘. 제목은 '프로젝트 브레인스토밍'이야."
 
 ## ⚠️ 중요 사항
