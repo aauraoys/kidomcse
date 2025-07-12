@@ -107,7 +107,12 @@ async def oauth_protected_resource():
 
 @app.get("/.well-known/oauth-authorization-server")
 async def oauth_authorization_server():
-    return {"status": "ok"}
+    return {
+        "issuer": "https://kic-dooray-mcp.onrender.com",
+        "token_endpoint": "https://kic-dooray-mcp.onrender.com/mcp/auth/set_token",
+        "grant_types_supported": ["client_credentials"],
+        "token_endpoint_auth_methods_supported": ["client_secret_post"]
+    }
 
 # --- 인증 API ---
 @app.post("/mcp/auth/set_token")
