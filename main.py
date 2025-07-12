@@ -116,6 +116,15 @@ async def read_root():
 async def register():
     return {"status": "ok"}
 
+@app.get("/health")
+async def health_check():
+    return {"status": "ok", "message": "MCP server is healthy"}
+
+@app.get("/mcp")
+async def mcp_base():
+    return {"message": "Dooray MCP base endpoint. Use /mcp/<service>/<action> for specific APIs."}
+
+
 @app.get("/.well-known/oauth-protected-resource")
 async def oauth_protected_resource():
     return {"status": "ok"}
