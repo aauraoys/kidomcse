@@ -90,7 +90,22 @@ from dooray_client import (
 # 세션 기반 토큰 저장을 위한 딕셔너리
 SESSION_TOKENS = {}
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
+
+# CORS 설정 추가
+origins = [
+    "*" # 모든 출처 허용 (개발 단계에서 편리, 프로덕션에서는 특정 도메인으로 제한 권장)
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"], # 모든 HTTP 메서드 허용
+    allow_headers=["*"], # 모든 헤더 허용
+)
 
 # Claude 및 기타 LLM 연동을 위한 표준 엔드포인트
 @app.get("/")
