@@ -87,9 +87,12 @@ from dooray_client import (
     delete_sync_department
 )
 
+# 세션 기반 토큰 저장을 위한 딕셔너리
+SESSION_TOKENS = {}
+
 app = FastAPI()
 
-# Claude가 Tool의 유효성을 검사할 때 사용하는 표준 엔드포인트에 대한 핸들러 추가
+# Claude 및 기타 LLM 연동을 위한 표준 엔드포인트
 @app.get("/")
 async def read_root():
     return {"message": "Dooray MCP is running."}
@@ -106,6 +109,28 @@ async def oauth_protected_resource():
 async def oauth_authorization_server():
     return {"status": "ok"}
 
+# --- 인증 API ---
+@app.post("/mcp/auth/set_token")
+async def set_token(request: Request):
+    """
+    현재 대화 세션에 대한 Dooray API 토큰을 설정합니다.
+    Claude의 'claude-conversation-id' 또는 일반 'X-Conversation-ID' 헤더를 사용합니다.
+    """
+    conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID")
+    if not conversation_id:
+        raise HTTPException(status_code=400, detail="Conversation ID 헤더('claude-conversation-id' 또는 'X-Conversation-ID')가 필요합니다.")
+
+    try:
+        body = await request.json()
+        token = body.get("token")
+        if not token:
+            raise HTTPException(status_code=400, detail="요청 본문에 'token'이 필요합니다.")
+    except Exception:
+        raise HTTPException(status_code=400, detail="잘못된 JSON 형식의 요청 본문입니다.")
+
+    SESSION_TOKENS[conversation_id] = token
+    return {"message": "현재 세션에 대한 API 토큰이 성공적으로 설정되었습니다."}
+
 
 def _handle_api_call(result):
     if "error" in result:
@@ -113,17 +138,32 @@ def _handle_api_call(result):
     return {"dooray_response": result}
 
 def _get_api_key(request: Request):
-    # ChatGPT는 API Key를 'X-API-Key' 헤더로 보낼 가능성이 높습니다。
-    # 또는 'Authorization' 헤더에 'Bearer <API_KEY>' 형태로 보낼 수도 있습니다.
+    """
+    하이브리드 인증 방식:
+    1. 세션 ID를 사용하여 세션별 토큰을 우선적으로 확인합니다.
+    2. 세션 토큰이 없으면 헤더의 고정 API 키를 사용합니다.
+    """
+    # 1. 세션 기반 인증 시도
+    conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID")
+    if conversation_id:
+        token = SESSION_TOKENS.get(conversation_id)
+        if not token:
+            raise HTTPException(
+                status_code=401,
+                detail="이 세션에 대한 API 토큰이 설정되지 않았습니다. '/mcp/auth/set_token'을 사용하여 먼저 토큰을 설정해주세요."
+            )
+        return token
+
+    # 2. 고정 API 키 인증으로 대체
     api_key = request.headers.get("X-API-Key")
     if not api_key:
-        # 'Authorization: Bearer <API_KEY>' 형태도 고려
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
             api_key = auth_header.split(" ")[1]
-    
+
     if not api_key:
-        raise HTTPException(status_code=401, detail="API Key is missing or invalid")
+        raise HTTPException(status_code=401, detail="API Key가 필요합니다. 'X-API-Key' 헤더를 사용하거나 세션 토큰을 설정해주세요.")
+        
     return api_key
 
 # --- Common API ---
