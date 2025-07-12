@@ -89,6 +89,24 @@ from dooray_client import (
 
 app = FastAPI()
 
+# Claude가 Tool의 유효성을 검사할 때 사용하는 표준 엔드포인트에 대한 핸들러 추가
+@app.get("/")
+async def read_root():
+    return {"message": "Dooray MCP is running."}
+
+@app.post("/register")
+async def register():
+    return {"status": "ok"}
+
+@app.get("/.well-known/oauth-protected-resource")
+async def oauth_protected_resource():
+    return {"status": "ok"}
+
+@app.get("/.well-known/oauth-authorization-server")
+async def oauth_authorization_server():
+    return {"status": "ok"}
+
+
 def _handle_api_call(result):
     if "error" in result:
         raise HTTPException(status_code=result.get("status_code", 500), detail=result["error"])
