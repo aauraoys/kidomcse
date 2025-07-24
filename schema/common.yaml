@@ -1,0 +1,33 @@
+paths:
+  /common/v1/members:
+    get:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                items:
+                  type: object
+                type: array
+          description: Member list
+      security:
+      - ApiKeyAuth: []
+      summary: List all members
+  /common/v1/members/{member_id}:
+    get:
+      parameters:
+      - in: path
+        name: member_id
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+          description: Member info
+      security:
+      - ApiKeyAuth: []
+      summary: Get member by ID

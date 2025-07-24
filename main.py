@@ -1,4 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, Response
+import json
+from fastapi.responses import JSONResponse
 import base64 # Import base64 for file handling
 from dooray_client import (
     # Common API
@@ -1041,3 +1043,8 @@ async def api_delete_sync_department(request: Request):
         raise HTTPException(status_code=400, detail="department_id is required")
     result = delete_sync_department(api_key, department_id)
     return _handle_api_call(result)
+
+@app.get("/schema.json", response_class=JSONResponse)
+async def serve_schema():
+    with open("schema.json", "r") as f:
+        return json.load(f)
