@@ -9,6 +9,11 @@ root = {
         "version": "1.0.0",
         "description": "Comprehensive Dooray API schema for LLMs"
     },
+    "servers": [ 
+        {
+            "url": "https://kic-dooray-mcp.onrender.com"
+        }
+    ],
     "paths": {},
     "components": {
         "securitySchemes": {
