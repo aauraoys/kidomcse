@@ -118,6 +118,17 @@ async def handle_tools_list(request_id):
                 },
                 "required": ["driveId"]
             }
+        },
+        {
+            "name": "dooray_setToken",
+            "description": "Set Dooray API token for authentication",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "token": {"type": "string", "description": "Your Dooray API token"}
+                },
+                "required": ["token"]
+            }
         }
     ]
     return {
@@ -137,7 +148,7 @@ async def handle_tools_call(request_id, params, request: Request):
         if not token:
             return {
                 "jsonrpc": "2.0", "id": request_id,
-                "error": {"code": 401, "message": "Unauthorized", "data": "API token is not set for this session. Please use '/mcp/auth/set_token' to set the token first."}
+                "result": {"content": [{"type": "text", "text": "🔐 Dooray API 토큰이 설정되지 않았습니다.\n\n먼저 'dooray_setToken' 도구를 사용하여 API 토큰을 설정해주세요:\n\n1. Dooray에서 API 토큰을 발급받으세요\n2. 'dooray_setToken' 도구에 토큰을 입력하세요\n3. 그 후 다른 Dooray 기능을 사용할 수 있습니다"}]}
             }
         
     else:
@@ -145,7 +156,7 @@ async def handle_tools_call(request_id, params, request: Request):
         if not token:
             return {
                 "jsonrpc": "2.0", "id": request_id,
-                "error": {"code": 401, "message": "Unauthorized", "data": "API token is missing. Either set DOORAY_API_TOKEN environment variable or use session-based authentication."}
+                "result": {"content": [{"type": "text", "text": "🔐 Dooray API 토큰이 설정되지 않았습니다.\n\n먼저 'dooray_setToken' 도구를 사용하여 API 토큰을 설정해주세요:\n\n1. Dooray에서 API 토큰을 발급받으세요\n2. 'dooray_setToken' 도구에 토큰을 입력하세요\n3. 그 후 다른 Dooray 기능을 사용할 수 있습니다"}]}
             }
 
     try:
@@ -207,6 +218,20 @@ async def handle_tools_call(request_id, params, request: Request):
             if "error" in result:
                 raise Exception(result.get("response", result.get("error")))
             return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
+
+        elif tool_name == "dooray_setToken":
+            token = arguments.get("token")
+            if not token:
+                return {
+                    "jsonrpc": "2.0", "id": request_id,
+                    "error": {"code": -32602, "message": "Invalid params", "data": "Token is required"}
+                }
+            
+            # Get conversation ID for session-based token storage
+            conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID") or "default"
+            SESSION_TOKENS[conversation_id] = token
+            
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": "Dooray API token has been set successfully. You can now use other Dooray functions."}]}}
 
         else:
             return {
