@@ -141,7 +141,22 @@ async def handle_tools_call(request_id, params, request: Request):
     tool_name = params.get("name")
     arguments = params.get("arguments", {})
     
-    # Get API token
+    # Handle token setting first (no authentication required)
+    if tool_name == "dooray_setToken":
+        token = arguments.get("token")
+        if not token:
+            return {
+                "jsonrpc": "2.0", "id": request_id,
+                "error": {"code": -32602, "message": "Invalid params", "data": "Token is required"}
+            }
+        
+        # Get conversation ID for session-based token storage
+        conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID") or "default"
+        SESSION_TOKENS[conversation_id] = token
+        
+        return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": "Dooray API token has been set successfully. You can now use other Dooray functions."}]}}
+    
+    # Get API token for other functions
     conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID")
     if conversation_id:
         token = SESSION_TOKENS.get(conversation_id)
@@ -218,20 +233,6 @@ async def handle_tools_call(request_id, params, request: Request):
             if "error" in result:
                 raise Exception(result.get("response", result.get("error")))
             return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
-
-        elif tool_name == "dooray_setToken":
-            token = arguments.get("token")
-            if not token:
-                return {
-                    "jsonrpc": "2.0", "id": request_id,
-                    "error": {"code": -32602, "message": "Invalid params", "data": "Token is required"}
-                }
-            
-            # Get conversation ID for session-based token storage
-            conversation_id = request.headers.get("claude-conversation-id") or request.headers.get("X-Conversation-ID") or "default"
-            SESSION_TOKENS[conversation_id] = token
-            
-            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": "Dooray API token has been set successfully. You can now use other Dooray functions."}]}}
 
         else:
             return {
