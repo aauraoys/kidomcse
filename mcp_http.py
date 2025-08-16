@@ -1,4 +1,3 @@
-
 import asyncio
 import os
 from fastapi import APIRouter, Request, HTTPException
@@ -63,13 +62,6 @@ async def handle_tools_list(request_id):
                     "dueDate": {"type": "string", "format": "date", "description": "The due date of the task."}
                 },
                 "required": ["projectId", "title"]
-            },
-            "outputSchema": {
-                "type": "object",
-                "properties": {
-                    "taskId": {"type": "string"},
-                    "url": {"type": "string"}
-                }
             }
         },
         {
@@ -82,22 +74,6 @@ async def handle_tools_list(request_id):
                     "cursor": {"type": "string"},
                     "limit": {"type": "integer", "default": 50}
                 }
-            },
-            "outputSchema": {
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "string"},
-                                "name": {"type": "string"}
-                            }
-                        }
-                    },
-                    "nextCursor": {"type": ["string", "null"]}
-                }
             }
         },
         {
@@ -109,22 +85,6 @@ async def handle_tools_list(request_id):
                     "projectId": {"type": "string"}
                 },
                 "required": ["projectId"]
-            },
-            "outputSchema": {
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "string"},
-                                "name": {"type": "string"},
-                                "email": {"type": ["string", "null"]}
-                            }
-                        }
-                    }
-                }
             }
         },
         {
@@ -136,21 +96,6 @@ async def handle_tools_list(request_id):
                     "projectId": {"type": "string"}
                 },
                 "required": ["projectId"]
-            },
-            "outputSchema": {
-                "type": "object",
-                "properties": {
-                    "items": {
-                        "type": "array",
-                        "items": {
-                            "type": "object",
-                            "properties": {
-                                "id": {"type": "string"},
-                                "name": {"type": "string"}
-                            }
-                        }
-                    }
-                }
             }
         }
     ]
