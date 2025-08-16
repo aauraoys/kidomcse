@@ -329,3 +329,30 @@ ChatGPT에서 이 MCP 서버를 연결한 후, 다음과 같이 프롬프트를 
 ## 📄 라이선스
 
 이 프로젝트는 MIT 라이선스 하에 배포됩니다.
+
+## MCP API
+
+### `initialize`
+
+```bash
+curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{ "jsonrpc":"2.0", "id":1, "method":"initialize", "params":{} }' | jq .
+```
+
+### `tools/list`
+
+```bash
+curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+  -H 'Content-Type: application/json' \
+  -d '{ "jsonrpc":"2.0", "id":2, "method":"tools/list", "params":{} }' | jq .
+```
+
+### `tools/call` (Example: getProjects)
+
+```bash
+curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+  -H 'Content-Type: application/json' \
+  -H "Authorization: Bearer ${DOORAY_API_TOKEN}" \
+  -d '{ "jsonrpc":"2.0", "id":3, "method":"tools/call", "params":{ "name":"dooray.getProjects", "arguments":{"limit":20} } }' | jq .
+```

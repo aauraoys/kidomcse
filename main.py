@@ -93,6 +93,7 @@ from dooray_client import (
 SESSION_TOKENS = {}
 
 from fastapi.middleware.cors import CORSMiddleware
+from mcp_http import router as mcp_router
 
 app = FastAPI()
 
@@ -108,6 +109,8 @@ app.add_middleware(
     allow_methods=["*"], # 모든 HTTP 메서드 허용
     allow_headers=["*"], # 모든 헤더 허용
 )
+
+app.include_router(mcp_router)
 
 # Claude 및 기타 LLM 연동을 위한 표준 엔드포인트
 @app.get("/")

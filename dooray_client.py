@@ -104,8 +104,11 @@ def send_message(access_token: str, recipient_id: str, message: str):
     return _call_dooray_api(access_token, "POST", endpoint, json_data)
 
 # --- Project API ---
-def get_projects(access_token: str):
-    return _call_dooray_api(access_token, "GET", "/project/v1/projects")
+def get_projects(access_token: str, limit: int = 50, cursor: str = None):
+    params = {"limit": limit}
+    if cursor:
+        params["cursor"] = cursor
+    return _call_dooray_api(access_token, "GET", "/project/v1/projects", params=params)
 
 def create_project(access_token: str, name: str, code: str, description: str = None):
     json_data = {
@@ -179,6 +182,10 @@ def create_project_post_comment(access_token: str, project_id: str, post_id: str
 
 def get_project_post_comments(access_token: str, project_id: str, post_id: str):
     return _call_dooray_api(access_token, "GET", f"/project/v1/projects/{project_id}/posts/{post_id}/comments")
+
+def get_project_tags(access_token: str, project_id: str):
+    return _call_dooray_api(access_token, "GET", f"/project/v1/projects/{project_id}/tags")
+
 
 def update_project_post_comment(access_token: str, project_id: str, post_id: str, comment_id: str, content: str):
     json_data = {"content": {"mimeType": "text/x-markdown", "content": content}}
