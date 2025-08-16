@@ -136,7 +136,7 @@ async def handle_tools_call(request_id, params, request: Request):
             )
             if "error" in result:
                 raise Exception(result.get("response", result.get("error")))
-            return {"jsonrpc": "2.0", "id": request_id, "result": result}
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
         
         elif tool_name == "dooray_createTask":
             result = dooray_create_task(
@@ -152,7 +152,7 @@ async def handle_tools_call(request_id, params, request: Request):
             # This is a placeholder for the URL, as the API doesn't return it directly.
             url = f"https://{os.getenv('DOORAY_DOMAIN')}/projects/{arguments.get('projectId')}/{task_id}"
 
-            return {"jsonrpc": "2.0", "id": request_id, "result": {"taskId": task_id, "url": url}}
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": f"Task created successfully. ID: {task_id}, URL: {url}"}]}}
 
         elif tool_name == "dooray_getMembers":
             result = dooray_get_members(
@@ -161,13 +161,13 @@ async def handle_tools_call(request_id, params, request: Request):
             )
             if "error" in result:
                 raise Exception(result.get("response", result.get("error")))
-            return {"jsonrpc": "2.0", "id": request_id, "result": result}
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
 
         elif tool_name == "dooray_getTags":
             result = dooray_get_tags(access_token=token, project_id=arguments.get("projectId"))
             if "error" in result:
                  raise Exception(result.get("response", result.get("error")))
-            return {"jsonrpc": "2.0", "id": request_id, "result": result}
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
 
         else:
             return {
