@@ -49,7 +49,7 @@ async def handle_ping(request_id):
 async def handle_tools_list(request_id):
     tools = [
         {
-            "name": "dooray.createTask",
+            "name": "dooray_createTask",
             "description": "Create a Dooray task",
             "inputSchema": {
                 "type": "object",
@@ -65,7 +65,7 @@ async def handle_tools_list(request_id):
             }
         },
         {
-            "name": "dooray.getProjects",
+            "name": "dooray_getProjects",
             "description": "Get a list of Dooray projects",
             "inputSchema": {
                 "type": "object",
@@ -77,7 +77,7 @@ async def handle_tools_list(request_id):
             }
         },
         {
-            "name": "dooray.getMembers",
+            "name": "dooray_getMembers",
             "description": "Get a list of members in a project",
             "inputSchema": {
                 "type": "object",
@@ -88,7 +88,7 @@ async def handle_tools_list(request_id):
             }
         },
         {
-            "name": "dooray.getTags",
+            "name": "dooray_getTags",
             "description": "Get a list of tags in a project",
             "inputSchema": {
                 "type": "object",
@@ -128,7 +128,7 @@ async def handle_tools_call(request_id, params, request: Request):
             }
 
     try:
-        if tool_name == "dooray.getProjects":
+        if tool_name == "dooray_getProjects":
             result = dooray_get_projects(
                 access_token=token,
                 limit=arguments.get("limit", 50),
@@ -138,7 +138,7 @@ async def handle_tools_call(request_id, params, request: Request):
                 raise Exception(result.get("response", result.get("error")))
             return {"jsonrpc": "2.0", "id": request_id, "result": result}
         
-        elif tool_name == "dooray.createTask":
+        elif tool_name == "dooray_createTask":
             result = dooray_create_task(
                 access_token=token,
                 project_id=arguments.get("projectId"),
@@ -154,7 +154,7 @@ async def handle_tools_call(request_id, params, request: Request):
 
             return {"jsonrpc": "2.0", "id": request_id, "result": {"taskId": task_id, "url": url}}
 
-        elif tool_name == "dooray.getMembers":
+        elif tool_name == "dooray_getMembers":
             result = dooray_get_members(
                 access_token=token,
                 project_id=arguments.get("projectId")
@@ -163,7 +163,7 @@ async def handle_tools_call(request_id, params, request: Request):
                 raise Exception(result.get("response", result.get("error")))
             return {"jsonrpc": "2.0", "id": request_id, "result": result}
 
-        elif tool_name == "dooray.getTags":
+        elif tool_name == "dooray_getTags":
             result = dooray_get_tags(access_token=token, project_id=arguments.get("projectId"))
             if "error" in result:
                  raise Exception(result.get("response", result.get("error")))
