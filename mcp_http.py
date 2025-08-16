@@ -10,7 +10,7 @@ from main import SESSION_TOKENS
 
 load_dotenv(dotenv_path=".env")
 
-from dooray_client import get_projects as dooray_get_projects, create_project_post as dooray_create_task, get_project_members as dooray_get_members, get_project_tags as dooray_get_tags
+from dooray_client import get_projects as dooray_get_projects, create_project_post as dooray_create_task, get_project_members as dooray_get_members, get_project_tags as dooray_get_tags, get_drive_list as dooray_get_drive_list, get_drive_files as dooray_get_drive_files
 
 # MCP Router
 router = APIRouter()
@@ -97,6 +97,27 @@ async def handle_tools_list(request_id):
                 },
                 "required": ["projectId"]
             }
+        },
+        {
+            "name": "dooray_getDriveList",
+            "description": "Get a list of Dooray drives",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "description": "Drive type (private or team)", "default": "private"}
+                }
+            }
+        },
+        {
+            "name": "dooray_getDriveFiles",
+            "description": "Get files from a Dooray drive",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "driveId": {"type": "string", "description": "The ID of the drive"}
+                },
+                "required": ["driveId"]
+            }
         }
     ]
     return {
@@ -167,6 +188,24 @@ async def handle_tools_call(request_id, params, request: Request):
             result = dooray_get_tags(access_token=token, project_id=arguments.get("projectId"))
             if "error" in result:
                  raise Exception(result.get("response", result.get("error")))
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
+
+        elif tool_name == "dooray_getDriveList":
+            result = dooray_get_drive_list(
+                access_token=token,
+                type=arguments.get("type", "private")
+            )
+            if "error" in result:
+                raise Exception(result.get("response", result.get("error")))
+            return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
+
+        elif tool_name == "dooray_getDriveFiles":
+            result = dooray_get_drive_files(
+                access_token=token,
+                drive_id=arguments.get("driveId")
+            )
+            if "error" in result:
+                raise Exception(result.get("response", result.get("error")))
             return {"jsonrpc": "2.0", "id": request_id, "result": {"content": [{"type": "text", "text": str(result)}]}}
 
         else:
