@@ -335,7 +335,7 @@ ChatGPT에서 이 MCP 서버를 연결한 후, 다음과 같이 프롬프트를 
 ### `initialize`
 
 ```bash
-curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+curl -s -X POST https://mcp.auraoys.xyz/mcp \
   -H 'Content-Type: application/json' \
   -d '{ "jsonrpc":"2.0", "id":1, "method":"initialize", "params":{} }' | jq .
 ```
@@ -343,7 +343,7 @@ curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
 ### `tools/list`
 
 ```bash
-curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+curl -s -X POST https://mcp.auraoys.xyz/mcp \
   -H 'Content-Type: application/json' \
   -d '{ "jsonrpc":"2.0", "id":2, "method":"tools/list", "params":{} }' | jq .
 ```
@@ -351,7 +351,7 @@ curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
 ### `tools/call` (Example: getProjects)
 
 ```bash
-curl -s -X POST https://kic-dooray-mcp.onrender.com/mcp \
+curl -s -X POST https://mcp.auraoys.xyz/mcp \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer ${DOORAY_API_TOKEN}" \
   -d '{ "jsonrpc":"2.0", "id":3, "method":"tools/call", "params":{ "name":"dooray.getProjects", "arguments":{"limit":20} } }' | jq .

@@ -181,7 +181,7 @@ async def lifespan(app: FastAPI):
         version="2.0.0",
         description="Official Dooray API integration for ChatGPT - Top 30 priority APIs",
         routes=app.routes,
-        servers=[{"url": "https://kic-dooray-mcp.onrender.com", "description": "Production server"}]
+        servers=[{"url": "https://mcp.auraoys.xyz", "description": "Production server"}]
     )
     
     # GPTs 30개 제한을 위한 우선순위 필터링
@@ -427,7 +427,7 @@ app = FastAPI(
     description="Official Dooray API integration for ChatGPT - Dynamically generated schema",
     servers=[
         {
-            "url": "https://kic-dooray-mcp.onrender.com",
+            "url": "https://mcp.auraoys.xyz",
             "description": "Production server"
         }
     ],
