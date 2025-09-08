@@ -1,3 +1,17 @@
 
 server.log
 .env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.venv/
+venv/
+env/
+
+# Local development files
+README.txt
+run.cmd
