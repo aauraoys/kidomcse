@@ -1,0 +1,1047 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Dooray MCP API",
+    "version": "2.0.0",
+    "description": "Official Dooray API integration for ChatGPT - Comprehensive API for managing projects, tasks, files, wiki, calendar, and messaging in Dooray platform"
+  },
+  "servers": [
+    {
+      "url": "https://mcp.auraoys.xyz",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/mcp/auth/set_token": {
+      "post": {
+        "summary": "Set Dooray API Token",
+        "description": "Set authentication token for accessing Dooray API",
+        "operationId": "setDoorayToken",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string",
+                    "description": "Dooray API access token"
+                  }
+                },
+                "required": ["token"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Token set successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {"type": "boolean"},
+                    "message": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/auth/status": {
+      "get": {
+        "summary": "Check Authentication Status",
+        "description": "Check if API token is set and valid",
+        "operationId": "getAuthStatus",
+        "responses": {
+          "200": {
+            "description": "Authentication status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "authenticated": {"type": "boolean"},
+                    "message": {"type": "string"}
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/drive/list": {
+      "post": {
+        "summary": "List Drives",
+        "description": "Get list of available drives (private, project)",
+        "operationId": "listDrives",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drive_type": {
+                    "type": "string",
+                    "enum": ["private", "project"],
+                    "default": "private",
+                    "description": "Type of drive to list"
+                  },
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID (required for project drives)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of drives",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "type": {"type": "string"},
+                          "createdAt": {"type": "string"},
+                          "updatedAt": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/drive/files/list": {
+      "post": {
+        "summary": "List Drive Files",
+        "description": "Get files from a specific drive",
+        "operationId": "listDriveFiles",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drive_id": {
+                    "type": "string",
+                    "description": "ID of the drive to list files from"
+                  }
+                },
+                "required": ["drive_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of files in the drive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "size": {"type": "integer"},
+                          "mimeType": {"type": "string"},
+                          "createdAt": {"type": "string"},
+                          "updatedAt": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/drive/files/download_complete": {
+      "post": {
+        "summary": "Download File Complete",
+        "description": "Download a file completely in one operation (recommended for small files)",
+        "operationId": "downloadFileComplete",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drive_id": {
+                    "type": "string",
+                    "description": "Drive ID where the file is located"
+                  },
+                  "file_id": {
+                    "type": "string",
+                    "description": "File ID to download"
+                  }
+                },
+                "required": ["drive_id", "file_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File content as base64",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "fileName": {"type": "string"},
+                    "fileSize": {"type": "integer"},
+                    "chunkSessionId": {"type": "string"},
+                    "totalChunks": {"type": "integer"},
+                    "chunkSize": {"type": "integer"},
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "chunkData": {"type": "string", "description": "Base64 encoded file content"},
+                        "fileName": {"type": "string"},
+                        "isLastChunk": {"type": "boolean"},
+                        "chunkIndex": {"type": "integer"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/drive/files/upload": {
+      "post": {
+        "summary": "Upload File to Drive",
+        "description": "Upload a file to a specific drive folder",
+        "operationId": "uploadFile",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drive_id": {
+                    "type": "string",
+                    "description": "Target drive ID"
+                  },
+                  "folder_id": {
+                    "type": "string",
+                    "description": "Target folder ID (optional)"
+                  },
+                  "file_name": {
+                    "type": "string",
+                    "description": "Name of the file to upload"
+                  },
+                  "file_content_base64": {
+                    "type": "string",
+                    "description": "Base64 encoded file content"
+                  }
+                },
+                "required": ["drive_id", "file_name", "file_content_base64"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "File uploaded successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "name": {"type": "string"},
+                        "size": {"type": "integer"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/drive/folders/create": {
+      "post": {
+        "summary": "Create Drive Folder",
+        "description": "Create a new folder in a drive",
+        "operationId": "createFolder",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "drive_id": {
+                    "type": "string",
+                    "description": "Target drive ID"
+                  },
+                  "parent_folder_id": {
+                    "type": "string",
+                    "description": "Parent folder ID"
+                  },
+                  "folder_name": {
+                    "type": "string",
+                    "description": "Name of the new folder"
+                  }
+                },
+                "required": ["drive_id", "parent_folder_id", "folder_name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Folder created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "name": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/list": {
+      "post": {
+        "summary": "List Projects",
+        "description": "Get list of accessible projects",
+        "operationId": "listProjects",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "limit": {
+                    "type": "integer",
+                    "default": 50,
+                    "description": "Number of projects to return"
+                  },
+                  "cursor": {
+                    "type": "string",
+                    "description": "Pagination cursor"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "code": {"type": "string"},
+                          "description": {"type": "string"},
+                          "createdAt": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/create": {
+      "post": {
+        "summary": "Create Project",
+        "description": "Create a new project",
+        "operationId": "createProject",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "Project name"
+                  },
+                  "code": {
+                    "type": "string",
+                    "description": "Project code (unique identifier)"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Project description"
+                  }
+                },
+                "required": ["name", "code"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Project created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "name": {"type": "string"},
+                        "code": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/posts/list": {
+      "post": {
+        "summary": "List Project Posts",
+        "description": "Get list of posts (tasks/issues) in a project",
+        "operationId": "listProjectPosts",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID to list posts from"
+                  }
+                },
+                "required": ["project_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of project posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "subject": {"type": "string"},
+                          "body": {"type": "object"},
+                          "postType": {"type": "string"},
+                          "createdAt": {"type": "string"},
+                          "updatedAt": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/posts/create": {
+      "post": {
+        "summary": "Create Project Post",
+        "description": "Create a new task/issue in a project",
+        "operationId": "createProjectPost",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Post title/subject"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Post content/description"
+                  },
+                  "post_type": {
+                    "type": "string",
+                    "enum": ["task", "issue"],
+                    "default": "task",
+                    "description": "Type of post to create"
+                  }
+                },
+                "required": ["project_id", "subject", "body"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "subject": {"type": "string"},
+                        "postType": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/posts/update": {
+      "post": {
+        "summary": "Update Project Post",
+        "description": "Update an existing project post",
+        "operationId": "updateProjectPost",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID"
+                  },
+                  "post_id": {
+                    "type": "string",
+                    "description": "Post ID to update"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Updated post title"
+                  },
+                  "body": {
+                    "type": "string",
+                    "description": "Updated post content"
+                  }
+                },
+                "required": ["project_id", "post_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "subject": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/posts/comments/create": {
+      "post": {
+        "summary": "Create Post Comment",
+        "description": "Add a comment to a project post",
+        "operationId": "createPostComment",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID"
+                  },
+                  "post_id": {
+                    "type": "string",
+                    "description": "Post ID to comment on"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Comment content"
+                  }
+                },
+                "required": ["project_id", "post_id", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Comment created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "content": {"type": "object"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/project/members/list": {
+      "post": {
+        "summary": "List Project Members",
+        "description": "Get list of members in a project",
+        "operationId": "listProjectMembers",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "project_id": {
+                    "type": "string",
+                    "description": "Project ID to list members from"
+                  }
+                },
+                "required": ["project_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of project members",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "email": {"type": "string"},
+                          "role": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/wiki/list": {
+      "post": {
+        "summary": "List Wikis",
+        "description": "Get list of available wikis",
+        "operationId": "listWikis",
+        "responses": {
+          "200": {
+            "description": "List of wikis",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "name": {"type": "string"},
+                          "description": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/wiki/pages/list": {
+      "post": {
+        "summary": "List Wiki Pages",
+        "description": "Get list of pages in a wiki",
+        "operationId": "listWikiPages",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wiki_id": {
+                    "type": "string",
+                    "description": "Wiki ID to list pages from"
+                  }
+                },
+                "required": ["wiki_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "List of wiki pages",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {"type": "string"},
+                          "subject": {"type": "string"},
+                          "body": {"type": "object"},
+                          "createdAt": {"type": "string"},
+                          "updatedAt": {"type": "string"}
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/wiki/pages/create": {
+      "post": {
+        "summary": "Create Wiki Page",
+        "description": "Create a new wiki page",
+        "operationId": "createWikiPage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wiki_id": {
+                    "type": "string",
+                    "description": "Wiki ID"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Page title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Page content (Markdown)"
+                  },
+                  "parent_page_id": {
+                    "type": "string",
+                    "description": "Parent page ID (optional)"
+                  }
+                },
+                "required": ["wiki_id", "subject", "content"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Wiki page created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "subject": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/wiki/pages/update": {
+      "post": {
+        "summary": "Update Wiki Page",
+        "description": "Update an existing wiki page",
+        "operationId": "updateWikiPage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "wiki_id": {
+                    "type": "string",
+                    "description": "Wiki ID"
+                  },
+                  "page_id": {
+                    "type": "string",
+                    "description": "Page ID to update"
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Updated page title"
+                  },
+                  "content": {
+                    "type": "string",
+                    "description": "Updated page content"
+                  }
+                },
+                "required": ["wiki_id", "page_id"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Wiki page updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "subject": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/mcp/messenger/send": {
+      "post": {
+        "summary": "Send Direct Message",
+        "description": "Send a direct message to a user",
+        "operationId": "sendMessage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipient_id": {
+                    "type": "string",
+                    "description": "ID of the message recipient"
+                  },
+                  "message": {
+                    "type": "string",
+                    "description": "Message content to send"
+                  }
+                },
+                "required": ["recipient_id", "message"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Message sent successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": {
+                      "type": "object",
+                      "properties": {
+                        "id": {"type": "string"},
+                        "sentAt": {"type": "string"}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "ApiToken": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization",
+        "description": "Dooray API token. Use /mcp/auth/set_token endpoint first to authenticate."
+      }
+    },
+    "schemas": {
+      "DriveFile": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "size": {"type": "integer"},
+          "mimeType": {"type": "string"},
+          "createdAt": {"type": "string"},
+          "updatedAt": {"type": "string"}
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "code": {"type": "string"},
+          "description": {"type": "string"},
+          "createdAt": {"type": "string"}
+        }
+      },
+      "ProjectPost": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "subject": {"type": "string"},
+          "body": {"type": "object"},
+          "postType": {"type": "string"},
+          "createdAt": {"type": "string"},
+          "updatedAt": {"type": "string"}
+        }
+      },
+      "WikiPage": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "subject": {"type": "string"},
+          "body": {"type": "object"},
+          "createdAt": {"type": "string"},
+          "updatedAt": {"type": "string"}
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {"type": "string"},
+          "message": {"type": "string"}
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiToken": []
+    }
+  ]
+}
